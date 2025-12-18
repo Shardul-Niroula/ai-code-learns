@@ -18,6 +18,7 @@ const CodeExplainer: React.FC = () => {
   const [leftWidth, setLeftWidth] = useState<number>(50); 
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
+  const [editorTheme, setEditorTheme] = useState<string>(document.documentElement.getAttribute('data-theme') === 'dark' ? 'vs-dark' : 'vs-light');
   
   // Mobile Top-Sheet state
   const [isEditorOpen, setIsEditorOpen] = useState<boolean>(true);
@@ -45,6 +46,22 @@ const CodeExplainer: React.FC = () => {
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const updateTheme = () => {
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'vs-dark' : 'vs-light';
+      setEditorTheme(theme);
+    };
+    
+    // Initial theme
+    updateTheme();
+    
+    // Listen for theme changes
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    
+    return () => observer.disconnect();
   }, []);
 
   // Load Preferences
@@ -169,21 +186,21 @@ const CodeExplainer: React.FC = () => {
     : `translateY(${mobileSheetOffset}%)`;
 
   return (
-    <div ref={containerRef} className="flex flex-col md:flex-row flex-1 overflow-hidden h-full relative bg-gray-50">
+    <div ref={containerRef} className="flex flex-col md:flex-row flex-1 overflow-hidden h-full relative bg-secondary">
       
       {/* Settings Modal: CRUD for Styles */}
       {showSettings && (
         <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl p-5 md:p-8 flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
+          <div className="bg-primary rounded-3xl shadow-theme-2xl w-full max-w-xl p-5 md:p-8 flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg md:text-2xl font-bold flex items-center gap-2 text-gray-800">
+              <h3 className="text-lg md:text-2xl font-bold flex items-center gap-2 text-primary">
                 <Settings className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" /> AI Styles
               </h3>
               <div className="flex items-center gap-2">
                 <button onClick={handleAddPreference} className="p-2 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100 transition-colors">
                   <Plus className="w-5 h-5" />
                 </button>
-                <button onClick={() => setShowSettings(false)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400">
+                <button onClick={() => setShowSettings(false)} className="p-2 hover:bg-tertiary rounded-full text-gray-400">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -199,19 +216,19 @@ const CodeExplainer: React.FC = () => {
                 <div 
                   key={pref.id} 
                   onClick={() => handlePreferenceToggle(pref.id)} 
-                  className={`group relative p-3 md:p-4 rounded-xl border-2 transition-all cursor-pointer ${selectedIds.includes(pref.id) ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                  className={`group relative p-3 md:p-4 rounded-xl border-2 transition-all cursor-pointer ${selectedIds.includes(pref.id) ? 'border-indigo-600 bg-indigo-50/50' : 'border-color bg-primary hover:border-gray-200'}`}
                 >
                   {editingId === pref.id ? (
                     <form onSubmit={saveEdit} className="space-y-3" onClick={e => e.stopPropagation()}>
                       <input 
-                        className="w-full text-sm font-bold bg-white border border-gray-300 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full text-sm font-bold bg-primary border border-color rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500"
                         value={editLabel}
                         onChange={(e) => setEditLabel(e.target.value)}
                         placeholder="Label"
                         autoFocus
                       />
                       <textarea 
-                        className="w-full text-[10px] md:text-xs bg-white border border-gray-300 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500 h-16 resize-none"
+                        className="w-full text-[10px] md:text-xs bg-primary border border-color rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500 h-16 resize-none"
                         value={editInstruction}
                         onChange={(e) => setEditInstruction(e.target.value)}
                         placeholder="AI Prompt..."
@@ -227,14 +244,14 @@ const CodeExplainer: React.FC = () => {
                         {selectedIds.includes(pref.id) && <Check className="w-3.5 h-3.5 text-white stroke-[3px]" />}
                       </div>
                       <div className="flex-1 overflow-hidden">
-                        <h4 className="font-bold text-gray-800 text-sm md:text-base truncate">{pref.label}</h4>
-                        <p className="text-[10px] md:text-xs text-gray-500 truncate">{pref.instruction}</p>
+                        <h4 className="font-bold text-primary text-sm md:text-base truncate">{pref.label}</h4>
+                        <p className="text-[10px] md:text-xs text-secondary truncate">{pref.instruction}</p>
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={(e) => { e.stopPropagation(); startEditing(pref); }} className="p-1.5 hover:bg-white rounded-md text-gray-400 hover:text-indigo-600 border border-transparent hover:border-indigo-100">
+                        <button onClick={(e) => { e.stopPropagation(); startEditing(pref); }} className="p-1.5 hover:bg-primary rounded-md text-gray-400 hover:text-indigo-600 border border-transparent hover:border-indigo-100">
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={(e) => deletePreference(pref.id, e)} className="p-1.5 hover:bg-white rounded-md text-gray-400 hover:text-rose-600 border border-transparent hover:border-rose-100">
+                        <button onClick={(e) => deletePreference(pref.id, e)} className="p-1.5 hover:bg-primary rounded-md text-gray-400 hover:text-rose-600 border border-transparent hover:border-rose-100">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -243,7 +260,7 @@ const CodeExplainer: React.FC = () => {
                 </div>
               ))}
             </div>
-            <button onClick={() => setShowSettings(false)} className="mt-6 w-full bg-indigo-600 text-white py-3 rounded-2xl font-bold text-sm md:text-base shadow-lg shadow-indigo-100">
+            <button onClick={() => setShowSettings(false)} className="mt-6 w-full bg-indigo-600 text-white py-3 rounded-2xl font-bold text-sm md:text-base shadow-theme-lg shadow-indigo-100">
               Apply Changes
             </button>
           </div>
@@ -253,26 +270,26 @@ const CodeExplainer: React.FC = () => {
       {/* Editor Section */}
       <div 
         style={isMobile ? { transform: finalMobileTransform, transition: isDraggingMobile ? 'none' : 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)', zIndex: 40 } : { width: `${leftWidth}%` }}
-        className={`bg-white flex flex-col border-b md:border-r shadow-2xl md:shadow-none ${isMobile ? 'absolute top-0 left-0 right-0 h-[60vh] rounded-b-[40px]' : 'h-full'}`}
+        className={`bg-primary flex flex-col border-b md:border-r border-color shadow-theme-2xl md:shadow-none ${isMobile ? 'absolute top-0 left-0 right-0 h-[60vh] rounded-b-[40px]' : 'h-full'}`}
       >
         <div className="flex-1 min-h-0">
-          <Editor height="100%" defaultLanguage="javascript" value={code} onChange={(val) => setCode(val || '')} theme="vs-light"
+          <Editor height="100%" defaultLanguage="javascript" value={code} onChange={(val) => setCode(val || '')} theme={editorTheme}
             options={{ minimap: { enabled: false }, fontSize: isMobile ? 12 : 14, automaticLayout: true, scrollBeyondLastLine: false, padding: { top: 20 }, lineNumbers: 'on', roundedSelection: true }} />
         </div>
-        <div className="p-3 md:p-4 border-t bg-gray-50 flex items-center justify-between shrink-0">
-          <button onClick={() => setShowSettings(true)} className="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 md:py-2 text-[11px] md:text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-100 transition-all shadow-sm">
+        <div className="p-3 md:p-4 border-t bg-secondary flex items-center justify-between shrink-0">
+          <button onClick={() => setShowSettings(true)} className="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 md:py-2 text-[11px] md:text-sm font-bold text-primary bg-primary border border-color rounded-xl hover:bg-tertiary transition-all shadow-theme">
             <Settings className="w-3.5 h-3.5 md:w-4 md:h-4" />
             <span>Styles</span>
             {selectedIds.length > 0 && <span className="bg-indigo-600 text-white text-[9px] rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center font-bold">{selectedIds.length}</span>}
           </button>
-          <button onClick={handleSubmit} disabled={isLoading || !code.trim()} className="flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2 md:py-2.5 bg-indigo-600 text-white rounded-xl text-xs md:text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 shadow-lg shadow-indigo-100">
+          <button onClick={handleSubmit} disabled={isLoading || !code.trim()} className="flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2 md:py-2.5 bg-indigo-600 text-white rounded-xl text-xs md:text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 shadow-theme-lg shadow-indigo-100">
             {isLoading ? <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" /> : <Wand2 className="w-4 h-4 md:w-5 md:h-5" />}
             <span>Explain</span>
           </button>
         </div>
         {isMobile && (
           <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center cursor-pointer" onClick={() => setIsEditorOpen(!isEditorOpen)} onMouseDown={startMobileDrag} onTouchStart={startMobileDrag}>
-            <div className="bg-white p-2 rounded-full shadow-lg border border-indigo-50 text-indigo-600">
+            <div className="bg-primary p-2 rounded-full shadow-theme-lg border border-indigo-50 text-indigo-600">
               {isEditorOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </div>
           </div>
@@ -280,18 +297,18 @@ const CodeExplainer: React.FC = () => {
       </div>
 
       {!isMobile && (
-        <div onMouseDown={startResizing} className={`w-2 cursor-col-resize flex items-center justify-center transition-all z-10 ${isResizing ? 'bg-indigo-600' : 'bg-gray-100 hover:bg-indigo-200'}`}>
-          <div className="p-0.5 rounded-full bg-white shadow-md border border-gray-200"><GripVertical className="w-4 h-4 text-gray-400" /></div>
+        <div onMouseDown={startResizing} className={`w-2 cursor-col-resize flex items-center justify-center transition-all z-10 ${isResizing ? 'bg-indigo-600' : 'bg-tertiary hover:bg-indigo-200'}`}>
+          <div className="p-0.5 rounded-full bg-primary shadow-theme-md border border-color"><GripVertical className="w-4 h-4 text-gray-400" /></div>
         </div>
       )}
 
       {/* Explanation Area */}
-      <div style={!isMobile ? { width: `${100 - leftWidth}%` } : {}} className={`flex-1 flex flex-col bg-white overflow-hidden ${isMobile ? 'pt-12' : ''}`}>
-        <div className="p-3 md:p-4 border-b bg-gray-50/50 flex items-center justify-between shrink-0">
-          <h2 className="font-bold text-gray-700 flex items-center gap-2 text-sm md:text-base">
+      <div style={!isMobile ? { width: `${100 - leftWidth}%` } : {}} className={`flex-1 flex flex-col bg-primary overflow-hidden ${isMobile ? 'pt-12' : ''}`}>
+        <div className="p-3 md:p-4 border-b bg-secondary flex items-center justify-between shrink-0">
+          <h2 className="font-bold text-primary flex items-center gap-2 text-sm md:text-base">
             <Info className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-500" /> AI Help
           </h2>
-          <button onClick={handleClearAll} className="flex items-center gap-1 px-2 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs font-bold text-indigo-600 hover:bg-indigo-50 rounded-lg border border-indigo-100 transition-all shadow-sm">
+          <button onClick={handleClearAll} className="flex items-center gap-1 px-2 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs font-bold text-indigo-600 hover:bg-indigo-50 rounded-lg border border-indigo-100 transition-all shadow-theme">
             <FilePlus className="w-3.5 h-3.5" /> Clear
           </button>
         </div>
@@ -303,7 +320,7 @@ const CodeExplainer: React.FC = () => {
                 code({node, inline, className, children, ...props}) {
                   const match = /language-(\w+)/.exec(className || '');
                   return !inline ? (
-                    <div className="rounded-2xl overflow-hidden my-6 shadow-xl border border-gray-100">
+                    <div className="rounded-2xl overflow-hidden my-6 shadow-theme-xl border border-color">
                       <SyntaxHighlighter style={atomDark} language={match ? match[1] : 'javascript'} PreTag="div" {...props}>{String(children).replace(/\n$/, '')}</SyntaxHighlighter>
                     </div>
                   ) : ( <code className="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-mono text-[13px] md:text-sm font-bold" {...props}>{children}</code> )
@@ -313,13 +330,13 @@ const CodeExplainer: React.FC = () => {
           ) : isLoading ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400 space-y-4 py-20">
               <div className="w-16 h-16 border-4 border-indigo-50 border-t-indigo-600 rounded-full animate-spin" />
-              <p className="text-sm md:text-base font-bold text-gray-600">Thinking...</p>
+              <p className="text-sm md:text-base font-bold text-secondary">Thinking...</p>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-gray-300 space-y-6 py-20">
               <Wand2 className="w-12 h-12 md:w-16 md:h-16 text-indigo-100" />
               <div className="text-center max-w-xs px-4">
-                <p className="text-xl font-extrabold text-gray-800">Start Learning</p>
+                <p className="text-xl font-extrabold text-primary">Start Learning</p>
                 <p className="text-xs text-gray-400 mt-2">Paste code above and click Explain to get started.</p>
               </div>
             </div>

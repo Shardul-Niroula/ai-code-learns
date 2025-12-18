@@ -18,6 +18,7 @@ const WordsDictionary: React.FC = () => {
   const [leftWidth, setLeftWidth] = useState<number>(40);
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
+  const [editorTheme, setEditorTheme] = useState<string>(document.documentElement.getAttribute('data-theme') === 'dark' ? 'vs-dark' : 'vs-light');
   const [isEditorOpen, setIsEditorOpen] = useState<boolean>(true);
   
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,6 +32,22 @@ const WordsDictionary: React.FC = () => {
     if (savedHistory) setHistory(JSON.parse(savedHistory));
     
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const updateTheme = () => {
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'vs-dark' : 'vs-light';
+      setEditorTheme(theme);
+    };
+    
+    // Initial theme
+    updateTheme();
+    
+    // Listen for theme changes
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    
+    return () => observer.disconnect();
   }, []);
 
   const saveToHistory = (word: string, def: string) => {
@@ -100,23 +117,23 @@ const WordsDictionary: React.FC = () => {
   }, [isResizing, handleMouseMove]);
 
   return (
-    <div ref={containerRef} className="flex flex-col md:flex-row flex-1 overflow-hidden h-full relative bg-gray-50">
+    <div ref={containerRef} className="flex flex-col md:flex-row flex-1 overflow-hidden h-full relative bg-secondary">
       
       {/* Left Pane: Input & History */}
       <div 
         style={isMobile ? { transform: isEditorOpen ? 'translateY(0)' : 'translateY(-90%)', zIndex: 40, transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)' } : { width: `${leftWidth}%` }}
-        className={`bg-white border-b md:border-r flex flex-col shadow-2xl md:shadow-none ${isMobile ? 'absolute top-0 left-0 right-0 h-[50vh] rounded-b-[30px]' : 'h-full'}`}
+        className={`bg-primary border-b md:border-r border-color flex flex-col shadow-theme-2xl md:shadow-none ${isMobile ? 'absolute top-0 left-0 right-0 h-[50vh] rounded-b-[30px]' : 'h-full'}`}
       >
         <div className="p-4 md:p-6 flex-1 flex flex-col min-h-0">
           <div className="mb-4">
             <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">Word / Concept</label>
-            <div className="h-20 md:h-24 border border-gray-100 rounded-xl overflow-hidden shadow-inner bg-gray-50 mb-3">
+            <div className="h-20 md:h-24 border border-color rounded-xl overflow-hidden shadow-inner bg-secondary mb-3">
               <Editor
                 height="100%"
                 defaultLanguage="javascript"
                 value={term}
                 onChange={(val) => setTerm(val || '')}
-                theme="vs-light"
+                theme={editorTheme}
                 options={{
                   minimap: { enabled: false },
                   fontSize: 14,
@@ -134,7 +151,7 @@ const WordsDictionary: React.FC = () => {
             <button 
               onClick={handleSearch}
               disabled={isLoading || !term.trim()}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 text-white rounded-xl text-xs md:text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-lg shadow-indigo-100"
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 text-white rounded-xl text-xs md:text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-theme-lg shadow-indigo-100"
             >
               {isLoading ? <Wand2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
               Define Quick
@@ -158,11 +175,11 @@ const WordsDictionary: React.FC = () => {
                   <div 
                     key={item.id} 
                     onClick={() => loadFromHistory(item)}
-                    className="group flex items-center justify-between p-3 bg-gray-50 hover:bg-indigo-50 border border-gray-100 hover:border-indigo-100 rounded-xl cursor-pointer transition-all"
+                    className="group flex items-center justify-between p-3 bg-secondary hover:bg-indigo-50 border border-color hover:border-indigo-100 rounded-xl cursor-pointer transition-all"
                   >
                     <div className="flex items-center gap-3 overflow-hidden">
                       <Clock className="w-3 h-3 text-indigo-400 shrink-0" />
-                      <span className="text-xs font-bold text-gray-700 truncate">{item.word}</span>
+                      <span className="text-xs font-bold text-primary truncate">{item.word}</span>
                     </div>
                     <button 
                       onClick={(e) => deleteHistoryItem(item.id, e)}
@@ -179,7 +196,7 @@ const WordsDictionary: React.FC = () => {
 
         {isMobile && (
           <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center cursor-pointer" onClick={() => setIsEditorOpen(!isEditorOpen)}>
-            <div className="bg-white p-2 rounded-full shadow-lg border border-indigo-50 text-indigo-600">
+            <div className="bg-primary p-2 rounded-full shadow-theme-lg border border-indigo-50 text-indigo-600">
               {isEditorOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </div>
           </div>
@@ -187,8 +204,8 @@ const WordsDictionary: React.FC = () => {
       </div>
 
       {!isMobile && (
-        <div onMouseDown={startResizing} className={`w-2 cursor-col-resize flex items-center justify-center transition-all z-10 ${isResizing ? 'bg-indigo-600' : 'bg-gray-100 hover:bg-indigo-200'}`}>
-          <div className="p-0.5 rounded-full bg-white shadow-md border border-gray-200">
+        <div onMouseDown={startResizing} className={`w-2 cursor-col-resize flex items-center justify-center transition-all z-10 ${isResizing ? 'bg-indigo-600' : 'bg-tertiary hover:bg-indigo-200'}`}>
+          <div className="p-0.5 rounded-full bg-primary shadow-theme-md border border-color">
             <GripVertical className="w-4 h-4 text-gray-400" />
           </div>
         </div>
@@ -197,11 +214,11 @@ const WordsDictionary: React.FC = () => {
       {/* Right Pane: Definition Display */}
       <div 
         style={!isMobile ? { width: `${100 - leftWidth}%` } : {}}
-        className={`flex-1 flex flex-col bg-white overflow-hidden ${isMobile ? 'pt-12' : ''}`}
+        className={`flex-1 flex flex-col bg-primary overflow-hidden ${isMobile ? 'pt-12' : ''}`}
       >
-        <div className="p-4 border-b bg-gray-50/50 flex items-center gap-2 shrink-0">
+        <div className="p-4 border-b bg-secondary flex items-center gap-2 shrink-0">
           <BookOpen className="w-4 h-4 text-indigo-500" />
-          <h2 className="text-sm md:text-base font-bold text-gray-700 uppercase tracking-wider">Concept Insight</h2>
+          <h2 className="text-sm md:text-base font-bold text-primary uppercase tracking-wider">Concept Insight</h2>
         </div>
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 md:p-8 prose prose-indigo max-w-none">
@@ -217,8 +234,8 @@ const WordsDictionary: React.FC = () => {
                     
                     if (isMetadata) {
                       return (
-                        <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border-l-4 border-indigo-500 rounded-r-xl my-2 shadow-sm">
-                          <span className="text-sm md:text-base font-black text-gray-800 tracking-tight">{children}</span>
+                        <div className="flex items-center gap-3 px-4 py-3 bg-secondary border-l-4 border-indigo-500 rounded-r-xl my-2 shadow-theme">
+                          <span className="text-sm md:text-base font-black text-primary tracking-tight">{children}</span>
                         </div>
                       );
                     }
@@ -231,10 +248,10 @@ const WordsDictionary: React.FC = () => {
                       );
                     }
 
-                    return <h3 className="text-gray-800 font-bold text-lg my-4" {...props}>{children}</h3>;
+                    return <h3 className="text-primary font-bold text-lg my-4" {...props}>{children}</h3>;
                   },
                   li: ({node, ...props}) => (
-                    <li className="flex gap-3 items-start mb-3 text-sm md:text-base text-gray-600 bg-indigo-50/30 p-2 rounded-lg border border-indigo-100/30">
+                    <li className="flex gap-3 items-start mb-3 text-sm md:text-base text-secondary bg-indigo-50/30 p-2 rounded-lg border border-indigo-100/30">
                       <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-2 shrink-0" />
                       <span className="font-medium">{props.children}</span>
                     </li>
@@ -243,7 +260,7 @@ const WordsDictionary: React.FC = () => {
                   code: ({node, inline, className, children, ...props}) => {
                     const match = /language-(\w+)/.exec(className || '');
                     return !inline ? (
-                      <div className="rounded-2xl overflow-hidden my-6 shadow-2xl shadow-indigo-100/50 border border-gray-100 bg-gray-900">
+                      <div className="rounded-2xl overflow-hidden my-6 shadow-theme-2xl shadow-indigo-100/50 border border-color bg-gray-900">
                         <SyntaxHighlighter style={atomDark} language={match ? match[1] : 'javascript'} PreTag="div" {...props}>
                           {String(children).replace(/\n$/, '')}
                         </SyntaxHighlighter>
@@ -252,8 +269,8 @@ const WordsDictionary: React.FC = () => {
                       <code className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md font-mono text-[13px] font-bold" {...props}>{children}</code>
                     );
                   },
-                  p: ({node, ...props}) => <p className="text-sm md:text-base text-gray-600 leading-relaxed my-2" {...props} />,
-                  hr: () => <hr className="my-8 border-gray-100" />
+                  p: ({node, ...props}) => <p className="text-sm md:text-base text-secondary leading-relaxed my-2" {...props} />,
+                  hr: () => <hr className="my-8 border-color" />
                 }}
               >
                 {definition}
@@ -266,11 +283,11 @@ const WordsDictionary: React.FC = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-gray-200 space-y-8 py-20">
-              <div className="p-10 bg-gray-50 rounded-full">
+              <div className="p-10 bg-secondary rounded-full">
                 <Search className="w-20 h-20 text-indigo-100" />
               </div>
               <div className="text-center max-w-sm px-6">
-                <p className="text-2xl font-black text-gray-800 uppercase tracking-tighter">Fast Knowledge</p>
+                <p className="text-2xl font-black text-primary uppercase tracking-tighter">Fast Knowledge</p>
                 <p className="text-xs md:text-sm text-gray-400 mt-3 font-medium leading-relaxed">
                   Enter any coding word like <span className="text-indigo-400 font-bold underline">"map"</span> or <span className="text-indigo-400 font-bold underline">"const"</span>. 
                   We'll give you category, purpose, properties, and more in seconds.

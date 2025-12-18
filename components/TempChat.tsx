@@ -80,15 +80,15 @@ const TempChat: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white relative">
+    <div className="flex flex-col h-full bg-primary relative">
       {/* Header Info */}
-      <div className="flex items-center justify-between px-6 py-4 border-b bg-white/80 backdrop-blur-md sticky top-0 z-20">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-color bg-primary/80 backdrop-blur-md sticky top-0 z-20">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-gradient-to-tr from-indigo-600 to-violet-600 rounded-xl text-white shadow-lg shadow-indigo-100">
+          <div className="p-2.5 bg-gradient-to-tr from-indigo-600 to-violet-600 rounded-xl text-white shadow-theme-lg shadow-indigo-100">
             <MessageSquare className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-sm md:text-base font-black text-gray-800 tracking-tight flex items-center gap-2">
+            <h2 className="text-sm md:text-base font-black text-primary tracking-tight flex items-center gap-2">
               AI Code Assistant
               <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[8px] font-black bg-indigo-50 text-indigo-600 uppercase tracking-widest border border-indigo-100">Pro</span>
             </h2>
@@ -116,13 +116,13 @@ const TempChat: React.FC = () => {
           <div className="h-full flex flex-col items-center justify-center text-center space-y-10 animate-in fade-in zoom-in-95 duration-700">
             <div className="relative group">
               <div className="absolute inset-0 bg-indigo-500 blur-[80px] rounded-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
-              <div className="relative p-12 bg-white border border-gray-100 rounded-[48px] shadow-2xl transition-transform group-hover:scale-105 duration-500">
+              <div className="relative p-12 bg-primary border border-color rounded-[48px] shadow-theme-2xl transition-transform group-hover:scale-105 duration-500">
                 <Sparkles className="w-20 h-20 text-indigo-500 animate-pulse" />
               </div>
             </div>
             <div className="max-w-md px-4">
-              <h3 className="text-4xl font-black text-gray-900 tracking-tighter mb-4 uppercase">Free Flow Chat</h3>
-              <p className="text-sm md:text-base font-medium text-gray-500 leading-relaxed mb-8">
+              <h3 className="text-4xl font-black text-primary tracking-tighter mb-4 uppercase">Free Flow Chat</h3>
+              <p className="text-sm md:text-base font-medium text-secondary leading-relaxed mb-8">
                 Your private, temporary playground for ideas, debugging, and learning. No history saved, no limits on curiosity.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -135,7 +135,7 @@ const TempChat: React.FC = () => {
                   <button 
                     key={item.label}
                     onClick={() => { setInput(item.label); handleSend(); }}
-                    className="flex items-center gap-3 px-5 py-3.5 bg-white border border-gray-100 text-xs font-black text-gray-600 rounded-2xl hover:border-indigo-400 hover:text-indigo-600 shadow-sm hover:shadow-indigo-100 hover:shadow-xl transition-all group"
+                    className="flex items-center gap-3 px-5 py-3.5 bg-primary border border-color text-xs font-black text-secondary rounded-2xl hover:border-indigo-400 hover:text-indigo-600 shadow-theme hover:shadow-indigo-100 hover:shadow-theme-xl transition-all group"
                   >
                     <span className="text-lg group-hover:scale-125 transition-transform">{item.icon}</span>
                     {item.label}
@@ -150,17 +150,17 @@ const TempChat: React.FC = () => {
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} group animate-in fade-in slide-in-from-bottom-6 duration-500`}>
                 <div className={`flex gap-5 max-w-[95%] md:max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                   {/* Avatar */}
-                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-[18px] flex items-center justify-center shrink-0 shadow-xl transition-transform hover:scale-110 ${msg.role === 'user' ? 'bg-indigo-600' : 'bg-white border border-gray-100'}`}>
+                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-[18px] flex items-center justify-center shrink-0 shadow-theme-xl transition-transform hover:scale-110 ${msg.role === 'user' ? 'bg-indigo-600' : 'bg-primary border border-color'}`}>
                     {msg.role === 'user' ? <User className="w-5 h-5 md:w-6 md:h-6 text-white" /> : <Bot className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" />}
                   </div>
                   
                   {/* Bubble Container */}
                   <div className={`relative flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                     <div className={`
-                      px-5 py-4 md:px-7 md:py-6 rounded-[32px] shadow-sm relative overflow-hidden
+                      px-5 py-4 md:px-7 md:py-6 rounded-[32px] shadow-theme relative overflow-hidden
                       ${msg.role === 'user' 
                         ? 'bg-indigo-600 text-white rounded-tr-none shadow-indigo-200' 
-                        : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none shadow-gray-200/50'
+                        : 'bg-primary text-primary border border-color rounded-tl-none shadow-theme'
                       }
                     `}>
                       {/* Thinking State for bot */}
@@ -177,11 +177,11 @@ const TempChat: React.FC = () => {
 
                       <div className={`
                         prose prose-sm md:prose-base max-w-none 
-                        ${msg.role === 'user' ? 'prose-p:text-white prose-p:font-medium' : 'prose-p:text-gray-700 prose-headings:text-gray-900 prose-headings:font-black prose-headings:tracking-tighter'}
+                        ${msg.role === 'user' ? 'prose-p:text-white prose-p:font-medium' : 'prose-p:text-primary prose-headings:text-primary prose-headings:font-black prose-headings:tracking-tighter'}
                         prose-p:leading-relaxed prose-pre:bg-gray-900 prose-pre:rounded-[24px] prose-pre:p-0 prose-pre:my-6
                         prose-strong:text-indigo-600 prose-strong:font-black
                         prose-ul:my-6 prose-li:my-2
-                        prose-hr:border-gray-100 prose-hr:my-8
+                        prose-hr:border-color prose-hr:my-8
                       `}>
                         <ReactMarkdown
                           components={{
@@ -197,7 +197,7 @@ const TempChat: React.FC = () => {
                               const codeId = `code-${idx}-${Math.random()}`;
                               
                               return !inline ? (
-                                <div className="relative group/code rounded-[24px] overflow-hidden border border-gray-800 my-6 shadow-2xl">
+                                <div className="relative group/code rounded-[24px] overflow-hidden border border-gray-800 my-6 shadow-theme-2xl">
                                   <div className="flex items-center justify-between px-6 py-3 bg-gray-800 border-b border-gray-700">
                                     <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
                                       <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
@@ -258,19 +258,19 @@ const TempChat: React.FC = () => {
       </div>
 
       {/* Input Field Area */}
-      <div className="p-4 md:p-10 border-t bg-white/80 backdrop-blur-md shrink-0 z-10">
+      <div className="p-4 md:p-10 border-t border-color bg-primary/80 backdrop-blur-md shrink-0 z-10">
         <div className="max-w-4xl mx-auto relative">
           {/* Action indicator */}
           {isTyping && (
-            <div className="absolute -top-10 left-4 flex items-center gap-2 px-3 py-1 bg-indigo-600 rounded-full text-white text-[9px] font-black uppercase tracking-widest shadow-xl animate-bounce">
+            <div className="absolute -top-10 left-4 flex items-center gap-2 px-3 py-1 bg-indigo-600 rounded-full text-white text-[9px] font-black uppercase tracking-widest shadow-theme-xl animate-bounce">
               <Loader2 className="w-3 h-3 animate-spin" />
               Assistant is Thinking
             </div>
           )}
 
           <div className={`
-            relative flex items-end gap-3 bg-gray-50 border border-gray-200 rounded-[32px] p-2 md:p-3 transition-all shadow-inner
-            ${isTyping ? 'opacity-70 grayscale' : 'focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-500 focus-within:bg-white'}
+            relative flex items-end gap-3 bg-secondary border border-color rounded-[32px] p-2 md:p-3 transition-all shadow-inner
+            ${isTyping ? 'opacity-70 grayscale' : 'focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-500 focus-within:bg-primary'}
           `}>
             <textarea
               value={input}
@@ -291,10 +291,10 @@ const TempChat: React.FC = () => {
               onClick={handleSend}
               disabled={!input.trim() || isTyping}
               className={`
-                p-4 rounded-[24px] transition-all shadow-xl flex items-center justify-center
+                p-4 rounded-[24px] transition-all shadow-theme-xl flex items-center justify-center
                 ${input.trim() && !isTyping 
                   ? 'bg-gradient-to-tr from-indigo-600 to-violet-600 text-white hover:shadow-indigo-200 hover:scale-105 active:scale-95' 
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-tertiary text-gray-400 cursor-not-allowed'
                 }
               `}
             >
