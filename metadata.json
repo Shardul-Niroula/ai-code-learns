@@ -1,0 +1,5 @@
+{
+  "name": "AI Code Assistant",
+  "description": "An AI-powered coding companion for students featuring a professional Monaco editor, personalized code explanations, and multi-preference AI responses.",
+  "requestFramePermissions": []
+}
