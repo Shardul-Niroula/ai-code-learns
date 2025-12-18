@@ -123,7 +123,7 @@ const Header: React.FC = () => {
         </button>
 
         {showModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
             <div 
               className="bg-primary rounded-2xl shadow-theme-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200"
               onClick={(e) => e.stopPropagation()}
